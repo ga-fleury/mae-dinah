@@ -1,0 +1,18 @@
+{
+  "name": "mae-dinah",
+  "version": "1.0.0",
+  "description": "fortune-teller twitter bot",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node bot.js"
+  },
+  "keywords": [],
+  "author": "Gabriel Fleury",
+  "license": "ISC",
+  "dependencies": {
+    "@viclafouch/fetch-crawler": "^1.0.13",
+    "node-fetch": "^2.6.1",
+    "twit": "^2.2.11"
+  }
+}
