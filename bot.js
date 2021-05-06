@@ -1,5 +1,16 @@
 const FetchCrawler = require("@viclafouch/fetch-crawler");
 const fs = require("fs");
+const express = require("express");
+
+const app = express();
+const port = process.env.PORT || 3000;
+
+app.listen(port, () => {
+    console.log("bravo six listening in");
+  });
+  app.use(express.static("public"));
+  
+  app.use(express.json({ limit: "1mb" }));
 
 require("dotenv").config();
 
