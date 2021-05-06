@@ -12,6 +12,13 @@ var T = new Twit({
     access_token_secret: process.env.ACCESS_TOKEN_SECRET,
 });
 
+var Datastore = require("nedb"),
+    db = new Datastore({ filename: "respostas.db" });
+db.loadDatabase(function (err) {
+    // Callback is optional
+    // Now commands will be executed
+});
+
 var data = new Date();
 var dia = ("0" + data.getDate()).slice(-2);
 var mes = ("0" + (data.getMonth() + 1)).slice(-2);
@@ -79,11 +86,31 @@ var zodiaco = {
     },
 };
 
-setInterval(function () {
-    singlePost.aleatorio();
-}, 1000 * 60 * 60);
+var randomMsg;
 
-setInterval(function () {
+var randomProperty = function (obj) {
+    var keys = Object.keys(obj);
+    return obj[keys[(keys.length * Math.random()) << 0]];
+};
+
+var singlePost = function () {
+    db.find({}, function (err, docs) {
+        var index = Math.floor(Math.random() * 6);
+        randomMsg = randomProperty(docs[index]);
+        console.log(randomMsg);
+        var randomMsgFinal = randomMsg + " 🔮✨";
+        T.post("statuses/update", { status: randomMsgFinal }, tweeted);
+    });
+};
+
+singlePost();
+horoscopoDia();
+
+setInterval(horoscopoDia, 1000 * 60 * 60 * 24);
+
+setInterval(singlePost, 1000 * 60 * 30);
+
+var horoscopoDia = function () {
     // `$ = Cheerio to get the content of the page
     // See https://cheerio.js.org
     const collectContent = ($) =>
@@ -148,7 +175,7 @@ setInterval(function () {
             maxRequest: 1,
         });
     }
-}, 1000 * 60 * 60 * 24);
+};
 
 console.log("bot is starting 🤖");
 
