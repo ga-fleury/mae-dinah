@@ -104,9 +104,7 @@ var singlePost = function () {
 };
 
 singlePost();
-horoscopoDia();
 
-setInterval(horoscopoDia, 1000 * 60 * 60 * 24);
 
 setInterval(singlePost, 1000 * 60 * 30);
 
@@ -188,3 +186,7 @@ function tweeted(err, data, response) {
         console.log("os espíritos receberam a sua mensagem 🔮");
     }
 }
+
+horoscopoDia();
+
+setInterval(horoscopoDia, 1000 * 60 * 60 * 24);
