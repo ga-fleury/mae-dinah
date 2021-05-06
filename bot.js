@@ -1,6 +1,8 @@
 const FetchCrawler = require("@viclafouch/fetch-crawler");
 const fs = require("fs");
 
+require('dotenv').config();
+
 var singlePost = require("./db-builder.js");
 
 
@@ -8,7 +10,14 @@ var Twit = require("twit");
 
 var config = require("./config.js");
 
-var T = new Twit(config);
+var T = new Twit({
+    consumer_key: process.env.CONSUMER_KEY,
+    consumer_secret: process.env.CONSUMER_SECRET,
+    access_token: process.env.ACCESS_TOKEN,
+    access_token_secret: process.env.ACCESS_TOKEN_SECRET,
+    timeout_ms: process.env.TIMEOUT_MS,
+    strictSSL: process.env.STRICT_SSL
+});
 
 var data = new Date();
 var dia = ("0" + data.getDate()).slice(-2);
