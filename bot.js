@@ -3,11 +3,7 @@ const fs = require("fs");
 
 require("dotenv").config();
 
-var singlePost = require("./db-builder.js");
-
 var Twit = require("twit");
-
-// var config = require("./config.js");
 
 var T = new Twit({
     consumer_key: process.env.CONSUMER_KEY,
