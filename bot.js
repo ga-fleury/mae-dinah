@@ -1,6 +1,9 @@
 const FetchCrawler = require("@viclafouch/fetch-crawler");
 const fs = require("fs");
 
+var singlePost = require("./db-builder.js");
+
+
 var Twit = require("twit");
 
 var config = require("./config.js");
@@ -10,6 +13,7 @@ var T = new Twit(config);
 var data = new Date();
 var dia = ("0" + data.getDate()).slice(-2);
 var mes = ("0" + (data.getMonth() + 1)).slice(-2);
+
 
 var zodiaco = {
     aries: {
@@ -74,70 +78,74 @@ var zodiaco = {
     },
 };
 
-// `$ = Cheerio to get the content of the page
-// See https://cheerio.js.org
-const collectContent = ($) =>
-    $("body").find("div.text  :nth-child(1)").text().trim();
+setInterval(singlePost.aleatorio(), 1000 * 60 * 60);
 
-// After getting content of the page, do what you want :)
-// Accept async function
-const doSomethingWith = (content, url, item) => {
-    var corte = content.indexOf("Saiba mais");
-    var prediction = content.substring(0, corte);
-    zodiaco[item].horoscopo = prediction;
-    console.log(item.toUpperCase());
-    console.log(`${prediction}`);
+setInterval(function () {
+    // `$ = Cheerio to get the content of the page
+    // See https://cheerio.js.org
+    const collectContent = ($) =>
+        $("body").find("div.text  :nth-child(1)").text().trim();
 
-    var mensagem =
-        zodiaco[item].simbolo +
-        " " +
-        zodiaco[item].nome +
-        " (" +
-        dia +
-        "/" +
-        mes +
-        ") - " +
-        prediction;
-    console.log(mensagem);
+    // After getting content of the page, do what you want :)
+    // Accept async function
+    const doSomethingWith = (content, url, item) => {
+        var corte = content.indexOf("Saiba mais");
+        var prediction = content.substring(0, corte);
+        zodiaco[item].horoscopo = prediction;
+        console.log(item.toUpperCase());
+        console.log(`${prediction}`);
 
-    // T.post("statuses/update", { status: mensagem }, tweeted);
+        var mensagem =
+            zodiaco[item].simbolo +
+            " " +
+            zodiaco[item].nome +
+            " (" +
+            dia +
+            "/" +
+            mes +
+            ") - " +
+            prediction;
+        console.log(mensagem);
 
-    itemsProcessed++;
-    console.log(itemsProcessed);
-    if (itemsProcessed === zodiaco.length) {
-        signosProntos();
+        T.post("statuses/update", { status: mensagem }, tweeted);
+
+        itemsProcessed++;
+        console.log(itemsProcessed);
+        if (itemsProcessed === zodiaco.length) {
+            signosProntos();
+        }
+    };
+
+    // Here I start my crawler
+    // You can await for it if you want
+
+    var signo = Object.keys(zodiaco);
+    signo.forEach(pegaHoroscopo);
+
+    function signosProntos() {
+        console.log("signos prontos");
+        console.log(zodiaco);
+        fs.writeFileSync("today.json", JSON.stringify(zodiaco));
     }
-};
 
-// Here I start my crawler
-// You can await for it if you want
+    var itemsProcessed = 0;
 
-var signo = Object.keys(zodiaco)
-signo.forEach(pegaHoroscopo);
-
-function signosProntos() {
-    console.log("signos prontos");
-    console.log(zodiaco);
-    fs.writeFileSync('today.json', JSON.stringify(zodiaco));
-}
-
-var itemsProcessed = 0;
-
-function pegaHoroscopo(item) {
-    FetchCrawler.launch({
-        url:
-            "https://www.uol.com.br/universa/horoscopo/" +
-            item +
-            "/horoscopo-do-dia/",
-        evaluatePage: ($) => collectContent($),
-        onSuccess: ({ result, url }) => {
-            doSomethingWith(result, url, item);
-        },
-        onError: ({ error, url }) =>
-            console.log("Whouaa something wrong happened :("),
-        maxRequest: 1,
-    });
-}
+    function pegaHoroscopo(item) {
+        FetchCrawler.launch({
+            url:
+                "https://www.uol.com.br/universa/horoscopo/" +
+                item +
+                "/horoscopo-do-dia/",
+            evaluatePage: ($) => collectContent($),
+            onSuccess: ({ result, url }) => {
+                doSomethingWith(result, url, item);
+            },
+            onError: ({ error, url }) =>
+                console.log("Whouaa something wrong happened :("),
+            maxRequest: 1,
+        });
+    }
+}, 1000 * 60 * 60 * 24);
 
 console.log("bot is starting 🤖");
 
