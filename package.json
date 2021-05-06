@@ -13,7 +13,6 @@
   "dependencies": {
     "@viclafouch/fetch-crawler": "^1.0.13",
     "dotenv": "^9.0.0",
-    "express": "^4.17.1",
     "nedb": "^1.8.0",
     "node-fetch": "^2.6.1",
     "twit": "^2.2.11"
